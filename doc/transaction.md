@@ -4,10 +4,12 @@
 ```sql
 transactions {
     id_transaction: INTEGER (Primary Key, Auto Increment)
-    date: DATETIME
     total_price: DECIMAL(10,2)
     payment_method: INTEGER (Foreign Key references payment_methods.id_payment)
     status: ENUM('pending', 'completed', 'cancelled', 'refunded')
+    id_user: INTEGER (Foreign Key references users.id_user)
+    created_at: TIMESTAMP (Default: CURRENT_TIMESTAMP)
+    updated_at: TIMESTAMP (Default: CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)
 }
 ```
 
@@ -38,14 +40,21 @@ Content-Type: application/json
     "message": "Transaction created successfully",
     "data": {
         "id_transaction": 1,
-        "date": "2025-05-27T10:30:00.000Z",
         "total_price": 299.98,
         "payment_method": 1,
         "status": "pending",
+        "id_user": 3,
+        "user_info": {
+            "id_user": 3,
+            "username": "john_cashier",
+            "role": "cashier"
+        },
         "payment_info": {
             "id_payment": 1,
             "payment_method": "Credit Card"
-        }
+        },
+        "created_at": "2025-05-27T10:30:00.000Z",
+        "updated_at": "2025-05-27T10:30:00.000Z"
     }
 }
 ```
@@ -88,6 +97,7 @@ Authorization: Bearer {token}
 - `limit` (optional): Items per page (default: 10)
 - `status` (optional): Filter by status
 - `payment_method` (optional): Filter by payment method ID
+- `user_id` (optional): Filter by user ID
 - `date_from` (optional): Start date (YYYY-MM-DD)
 - `date_to` (optional): End date (YYYY-MM-DD)
 - `min_amount` (optional): Minimum transaction amount
@@ -101,25 +111,39 @@ Authorization: Bearer {token}
         "transactions": [
             {
                 "id_transaction": 1,
-                "date": "2025-05-27T10:30:00.000Z",
                 "total_price": 299.98,
                 "payment_method": 1,
                 "status": "completed",
+                "id_user": 3,
+                "user_info": {
+                    "id_user": 3,
+                    "username": "john_cashier",
+                    "role": "cashier"
+                },
                 "payment_info": {
                     "id_payment": 1,
                     "payment_method": "Credit Card"
-                }
+                },
+                "created_at": "2025-05-27T10:30:00.000Z",
+                "updated_at": "2025-05-27T11:00:00.000Z"
             },
             {
                 "id_transaction": 2,
-                "date": "2025-05-27T11:45:00.000Z",
                 "total_price": 89.99,
                 "payment_method": 3,
                 "status": "completed",
+                "id_user": 2,
+                "user_info": {
+                    "id_user": 2,
+                    "username": "jane_manager",
+                    "role": "manager"
+                },
                 "payment_info": {
                     "id_payment": 3,
                     "payment_method": "Cash"
-                }
+                },
+                "created_at": "2025-05-27T11:45:00.000Z",
+                "updated_at": "2025-05-27T11:45:00.000Z"
             }
         ],
         "pagination": {
@@ -155,14 +179,21 @@ Authorization: Bearer {token}
     "success": true,
     "data": {
         "id_transaction": 1,
-        "date": "2025-05-27T10:30:00.000Z",
         "total_price": 299.98,
         "payment_method": 1,
         "status": "completed",
+        "id_user": 3,
+        "user_info": {
+            "id_user": 3,
+            "username": "john_cashier",
+            "role": "cashier"
+        },
         "payment_info": {
             "id_payment": 1,
             "payment_method": "Credit Card"
-        }
+        },
+        "created_at": "2025-05-27T10:30:00.000Z",
+        "updated_at": "2025-05-27T11:00:00.000Z"
     }
 }
 ```
@@ -202,14 +233,21 @@ Content-Type: application/json
     "message": "Transaction updated successfully",
     "data": {
         "id_transaction": 1,
-        "date": "2025-05-27T10:30:00.000Z",
         "total_price": 319.98,
         "payment_method": 2,
         "status": "completed",
+        "id_user": 3,
+        "user_info": {
+            "id_user": 3,
+            "username": "john_cashier",
+            "role": "cashier"
+        },
         "payment_info": {
             "id_payment": 2,
             "payment_method": "Debit Card"
-        }
+        },
+        "created_at": "2025-05-27T10:30:00.000Z",
+        "updated_at": "2025-05-27T12:15:00.000Z"
     }
 }
 ```
@@ -281,7 +319,7 @@ Authorization: Bearer {token}
     "data": {
         "id_transaction": 1,
         "status": "cancelled",
-        "cancelled_at": "2025-05-27T12:00:00.000Z"
+        "updated_at": "2025-05-27T12:00:00.000Z"
     }
 }
 ```
@@ -324,7 +362,7 @@ Content-Type: application/json
         "status": "refunded",
         "refund_amount": 299.98,
         "refund_reason": "Customer request",
-        "refunded_at": "2025-05-27T12:00:00.000Z"
+        "updated_at": "2025-05-27T12:00:00.000Z"
     }
 }
 ```
@@ -387,6 +425,7 @@ Authorization: Bearer {token}
 - `period` (optional): Time period (today, week, month, year)
 - `date_from` (optional): Start date (YYYY-MM-DD)
 - `date_to` (optional): End date (YYYY-MM-DD)
+- `user_id` (optional): Filter by specific user
 
 **Response Success (200):**
 ```json
@@ -417,16 +456,18 @@ Authorization: Bearer {token}
                 "total": 376.00
             }
         },
-        "hourly_breakdown": [
+        "user_performance": [
             {
-                "hour": 9,
-                "transactions": 5,
-                "revenue": 456.78
+                "id_user": 3,
+                "username": "john_cashier",
+                "transactions": 18,
+                "total_amount": 1456.78
             },
             {
-                "hour": 10,
-                "transactions": 8,
-                "revenue": 678.90
+                "id_user": 2,
+                "username": "jane_manager",
+                "transactions": 15,
+                "total_amount": 1200.50
             }
         ]
     }
@@ -448,6 +489,7 @@ Authorization: Bearer {token}
 - `end_date`: End date (YYYY-MM-DD) (required)
 - `status` (optional): Filter by status
 - `payment_method` (optional): Filter by payment method
+- `user_id` (optional): Filter by user ID
 
 **Response Success (200):**
 ```json
@@ -461,14 +503,19 @@ Authorization: Bearer {token}
         "transactions": [
             {
                 "id_transaction": 1,
-                "date": "2025-05-27T10:30:00.000Z",
                 "total_price": 299.98,
                 "payment_method": 1,
                 "status": "completed",
+                "id_user": 3,
+                "user_info": {
+                    "username": "john_cashier",
+                    "role": "cashier"
+                },
                 "payment_info": {
-                    "id_payment": 1,
                     "payment_method": "Credit Card"
-                }
+                },
+                "created_at": "2025-05-27T10:30:00.000Z",
+                "updated_at": "2025-05-27T11:00:00.000Z"
             }
         ],
         "summary": {
@@ -505,3 +552,24 @@ pending → completed
 pending → cancelled
 completed → refunded
 ```
+
+## Validation Rules
+- **total_price**: 
+  - Required
+  - Must be a positive decimal number
+  - Maximum 2 decimal places
+- **payment_method**: 
+  - Required
+  - Must reference an existing payment method
+- **status**: 
+  - Required
+  - Must be one of: pending, completed, cancelled, refunded
+- **id_user**: 
+  - Auto-filled from JWT token (authenticated user)
+  - Cannot be modified after creation
+- **created_at**: 
+  - Auto-generated on transaction creation
+  - Cannot be modified after creation
+- **updated_at**: 
+  - Auto-updated whenever transaction data is modified
+  - Updates on status changes, amount updates

@@ -5,6 +5,8 @@
 payment_methods {
     id_payment: INTEGER (Primary Key, Auto Increment)
     payment_method: VARCHAR(50) (Unique)
+    created_at: TIMESTAMP (Default: CURRENT_TIMESTAMP)
+    updated_at: TIMESTAMP (Default: CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)
 }
 ```
 
@@ -33,7 +35,9 @@ Content-Type: application/json
     "message": "Payment method created successfully",
     "data": {
         "id_payment": 1,
-        "payment_method": "Credit Card"
+        "payment_method": "Credit Card",
+        "created_at": "2025-05-27T10:30:00.000Z",
+        "updated_at": "2025-05-27T10:30:00.000Z"
     }
 }
 ```
@@ -79,23 +83,33 @@ Authorization: Bearer {token}
         "payment_methods": [
             {
                 "id_payment": 1,
-                "payment_method": "Credit Card"
+                "payment_method": "Credit Card",
+                "created_at": "2025-05-27T10:30:00.000Z",
+                "updated_at": "2025-05-27T10:30:00.000Z"
             },
             {
                 "id_payment": 2,
-                "payment_method": "Debit Card"
+                "payment_method": "Debit Card",
+                "created_at": "2025-05-26T14:20:00.000Z",
+                "updated_at": "2025-05-26T14:20:00.000Z"
             },
             {
                 "id_payment": 3,
-                "payment_method": "Cash"
+                "payment_method": "Cash",
+                "created_at": "2025-05-25T09:15:00.000Z",
+                "updated_at": "2025-05-25T09:15:00.000Z"
             },
             {
                 "id_payment": 4,
-                "payment_method": "Digital Wallet"
+                "payment_method": "Digital Wallet",
+                "created_at": "2025-05-24T16:45:00.000Z",
+                "updated_at": "2025-05-27T08:30:00.000Z"
             },
             {
                 "id_payment": 5,
-                "payment_method": "Bank Transfer"
+                "payment_method": "Bank Transfer",
+                "created_at": "2025-05-23T11:10:00.000Z",
+                "updated_at": "2025-05-23T11:10:00.000Z"
             }
         ],
         "pagination": {
@@ -124,7 +138,9 @@ Authorization: Bearer {token}
     "success": true,
     "data": {
         "id_payment": 1,
-        "payment_method": "Credit Card"
+        "payment_method": "Credit Card",
+        "created_at": "2025-05-27T10:30:00.000Z",
+        "updated_at": "2025-05-27T10:30:00.000Z"
     }
 }
 ```
@@ -162,7 +178,9 @@ Content-Type: application/json
     "message": "Payment method updated successfully",
     "data": {
         "id_payment": 1,
-        "payment_method": "Visa Credit Card"
+        "payment_method": "Visa Credit Card",
+        "created_at": "2025-05-27T10:30:00.000Z",
+        "updated_at": "2025-05-27T12:15:00.000Z"
     }
 }
 ```
@@ -257,11 +275,15 @@ Authorization: Bearer {token}
         "payment_methods": [
             {
                 "id_payment": 1,
-                "payment_method": "Credit Card"
+                "payment_method": "Credit Card",
+                "created_at": "2025-05-27T10:30:00.000Z",
+                "updated_at": "2025-05-27T10:30:00.000Z"
             },
             {
                 "id_payment": 2,
-                "payment_method": "Debit Card"
+                "payment_method": "Debit Card",
+                "created_at": "2025-05-26T14:20:00.000Z",
+                "updated_at": "2025-05-26T14:20:00.000Z"
             }
         ],
         "total_results": 2
@@ -287,15 +309,21 @@ Authorization: Bearer {token}
         "payment_methods": [
             {
                 "id_payment": 1,
-                "payment_method": "Credit Card"
+                "payment_method": "Credit Card",
+                "created_at": "2025-05-27T10:30:00.000Z",
+                "updated_at": "2025-05-27T10:30:00.000Z"
             },
             {
                 "id_payment": 2,
-                "payment_method": "Cash"
+                "payment_method": "Cash",
+                "created_at": "2025-05-25T09:15:00.000Z",
+                "updated_at": "2025-05-25T09:15:00.000Z"
             },
             {
                 "id_payment": 3,
-                "payment_method": "Digital Wallet"
+                "payment_method": "Digital Wallet",
+                "created_at": "2025-05-24T16:45:00.000Z",
+                "updated_at": "2025-05-27T08:30:00.000Z"
             }
         ],
         "total_active": 3
@@ -330,48 +358,12 @@ Authorization: Bearer {your_jwt_token}
   - Maximum length: 50 characters
   - Cannot be empty or contain only whitespace
   - Common values: "Cash", "Credit Card", "Debit Card", "Digital Wallet", "Bank Transfer", "Check"
-
-## Usage Examples
-
-### Creating a new payment method:
-```bash
-curl -X POST http://localhost:3000/api/payment-methods \
-  -H "Authorization: Bearer your_token_here" \
-  -H "Content-Type: application/json" \
-  -d '{"payment_method": "PayPal"}'
-```
-
-### Getting all payment methods:
-```bash
-curl -X GET http://localhost:3000/api/payment-methods \
-  -H "Authorization: Bearer your_token_here"
-```
-
-### Updating a payment method:
-```bash
-curl -X PUT http://localhost:3000/api/payment-methods/1 \
-  -H "Authorization: Bearer your_token_here" \
-  -H "Content-Type: application/json" \
-  -d '{"payment_method": "Mastercard Credit Card"}'
-```
-
-### Searching payment methods:
-```bash
-curl -X GET "http://localhost:3000/api/payment-methods/search?q=card" \
-  -H "Authorization: Bearer your_token_here"
-```
-
-### Getting active payment methods for POS:
-```bash
-curl -X GET http://localhost:3000/api/payment-methods/active \
-  -H "Authorization: Bearer your_token_here"
-```
-
-### Deleting a payment method:
-```bash
-curl -X DELETE http://localhost:3000/api/payment-methods/1 \
-  -H "Authorization: Bearer your_token_here"
-```
+- **created_at**: 
+  - Auto-generated on payment method creation
+  - Cannot be modified after creation
+- **updated_at**: 
+  - Auto-updated whenever payment method data is modified
+  - Updates when payment method name is changed
 
 ## Common Payment Methods in Indonesia
 
@@ -390,3 +382,7 @@ In Indonesia, the following payment methods are commonly used:
     - ShopeePay
 
 4. **QRIS (Quick Response Code Indonesian Standard)** - Unified QR code payment system
+
+5. **Credit/Debit Cards** - Visa, Mastercard, and local bank cards
+
+6. **Mobile Banking** - Direct bank account transfers via mobile apps

@@ -8,6 +8,9 @@ users {
     password: VARCHAR(255) (Hashed)
     email: VARCHAR(100) (Unique)
     role: ENUM('admin', 'cashier', 'manager')
+    token: VARCHAR(500) (Nullable, JWT token for session management)
+    created_at: TIMESTAMP (Default: CURRENT_TIMESTAMP)
+    updated_at: TIMESTAMP (Default: CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)
 }
 ```
 
@@ -35,7 +38,9 @@ users {
         "id_user": 1,
         "username": "john_doe",
         "email": "john@example.com",
-        "role": "cashier"
+        "role": "cashier",
+        "created_at": "2025-05-27T10:30:00.000Z",
+        "updated_at": "2025-05-27T10:30:00.000Z"
     }
 }
 ```
@@ -72,7 +77,9 @@ users {
             "id_user": 1,
             "username": "john_doe",
             "email": "john@example.com",
-            "role": "cashier"
+            "role": "cashier",
+            "created_at": "2025-05-27T10:30:00.000Z",
+            "updated_at": "2025-05-27T10:45:00.000Z"
         },
         "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
     }
@@ -105,7 +112,9 @@ Authorization: Bearer {token}
         "id_user": 1,
         "username": "john_doe",
         "email": "john@example.com",
-        "role": "cashier"
+        "role": "cashier",
+        "created_at": "2025-05-27T10:30:00.000Z",
+        "updated_at": "2025-05-27T10:45:00.000Z"
     }
 }
 ```
@@ -143,13 +152,17 @@ Authorization: Bearer {token}
                 "id_user": 1,
                 "username": "john_doe",
                 "email": "john@example.com",
-                "role": "cashier"
+                "role": "cashier",
+                "created_at": "2025-05-27T10:30:00.000Z",
+                "updated_at": "2025-05-27T10:45:00.000Z"
             },
             {
                 "id_user": 2,
                 "username": "jane_admin",
                 "email": "jane@example.com",
-                "role": "admin"
+                "role": "admin",
+                "created_at": "2025-05-26T09:15:00.000Z",
+                "updated_at": "2025-05-27T08:20:00.000Z"
             }
         ],
         "pagination": {
@@ -189,7 +202,9 @@ Authorization: Bearer {token}
         "id_user": 1,
         "username": "john_updated",
         "email": "john.updated@example.com",
-        "role": "manager"
+        "role": "manager",
+        "created_at": "2025-05-27T10:30:00.000Z",
+        "updated_at": "2025-05-27T11:15:00.000Z"
     }
 }
 ```
@@ -224,7 +239,10 @@ Authorization: Bearer {token}
 ```json
 {
     "success": true,
-    "message": "Password changed successfully"
+    "message": "Password changed successfully",
+    "data": {
+        "updated_at": "2025-05-27T11:20:00.000Z"
+    }
 }
 ```
 
@@ -280,6 +298,28 @@ Authorization: Bearer {token}
 }
 ```
 
+## Refresh Token
+**Endpoint:** `POST /api/users/refresh-token`
+
+**Description:** Refresh JWT token for extended session
+
+**Headers:**
+```
+Authorization: Bearer {token}
+```
+
+**Response Success (200):**
+```json
+{
+    "success": true,
+    "message": "Token refreshed successfully",
+    "data": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+        "expires_at": "2025-05-28T10:30:00.000Z"
+    }
+}
+```
+
 ## Error Codes
 - **400** - Bad Request (Invalid input data)
 - **401** - Unauthorized (Invalid credentials or token)
@@ -293,6 +333,13 @@ All protected endpoints require a valid JWT token in the Authorization header:
 ```
 Authorization: Bearer {your_jwt_token}
 ```
+
+## Token Management
+- **token**: Stores the current JWT token for session management
+- **created_at**: Records when the user account was created
+- **updated_at**: Automatically updates when any user data is modified
+- Tokens are invalidated on logout and stored as NULL
+- Token refresh extends session without requiring re-login
 
 ## Role Permissions
 - **admin**: Full access to all endpoints

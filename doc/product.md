@@ -9,6 +9,8 @@ products {
     stock: INTEGER
     desc: TEXT
     id_category: INTEGER (Foreign Key references categories.id_category)
+    created_at: TIMESTAMP (Default: CURRENT_TIMESTAMP)
+    updated_at: TIMESTAMP (Default: CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP)
 }
 ```
 
@@ -49,7 +51,9 @@ Content-Type: application/json
         "category": {
             "id_category": 1,
             "category_name": "Electronics"
-        }
+        },
+        "created_at": "2025-05-27T10:30:00.000Z",
+        "updated_at": "2025-05-27T10:30:00.000Z"
     }
 }
 ```
@@ -112,7 +116,9 @@ Authorization: Bearer {token}
                 "category": {
                     "id_category": 1,
                     "category_name": "Electronics"
-                }
+                },
+                "created_at": "2025-05-27T10:30:00.000Z",
+                "updated_at": "2025-05-27T10:30:00.000Z"
             },
             {
                 "id_product": 2,
@@ -124,7 +130,9 @@ Authorization: Bearer {token}
                 "category": {
                     "id_category": 1,
                     "category_name": "Electronics"
-                }
+                },
+                "created_at": "2025-05-26T14:20:00.000Z",
+                "updated_at": "2025-05-27T09:15:00.000Z"
             }
         ],
         "pagination": {
@@ -161,7 +169,9 @@ Authorization: Bearer {token}
         "category": {
             "id_category": 1,
             "category_name": "Electronics"
-        }
+        },
+        "created_at": "2025-05-27T10:30:00.000Z",
+        "updated_at": "2025-05-27T10:30:00.000Z"
     }
 }
 ```
@@ -211,7 +221,9 @@ Content-Type: application/json
         "category": {
             "id_category": 1,
             "category_name": "Electronics"
-        }
+        },
+        "created_at": "2025-05-27T10:30:00.000Z",
+        "updated_at": "2025-05-27T11:45:00.000Z"
     }
 }
 ```
@@ -276,7 +288,8 @@ Content-Type: application/json
         "id_product": 1,
         "product_name": "iPhone 15 Pro",
         "previous_stock": 50,
-        "current_stock": 25
+        "current_stock": 25,
+        "updated_at": "2025-05-27T12:00:00.000Z"
     }
 }
 ```
@@ -354,7 +367,9 @@ Authorization: Bearer {token}
                 "category": {
                     "id_category": 1,
                     "category_name": "Electronics"
-                }
+                },
+                "created_at": "2025-05-27T10:30:00.000Z",
+                "updated_at": "2025-05-27T10:30:00.000Z"
             }
         ],
         "total_results": 1
@@ -391,7 +406,9 @@ Authorization: Bearer {token}
                 "product_name": "iPhone 15 Pro",
                 "price": 999.99,
                 "stock": 50,
-                "desc": "Latest iPhone with advanced camera system"
+                "desc": "Latest iPhone with advanced camera system",
+                "created_at": "2025-05-27T10:30:00.000Z",
+                "updated_at": "2025-05-27T10:30:00.000Z"
             }
         ],
         "pagination": {
@@ -434,7 +451,9 @@ Authorization: Bearer {token}
                 "category": {
                     "id_category": 1,
                     "category_name": "Electronics"
-                }
+                },
+                "created_at": "2025-05-25T08:00:00.000Z",
+                "updated_at": "2025-05-27T09:30:00.000Z"
             }
         ],
         "threshold": 10,
@@ -462,3 +481,29 @@ Authorization: Bearer {your_jwt_token}
 - **admin**: Full access to all product endpoints
 - **manager**: Can create, read, update products and manage stock
 - **cashier**: Read-only access to products
+
+## Validation Rules
+- **product_name**: 
+  - Required
+  - Must be unique
+  - Maximum length: 100 characters
+  - Cannot be empty or contain only whitespace
+- **price**: 
+  - Required
+  - Must be a positive decimal number
+  - Maximum 2 decimal places
+- **stock**: 
+  - Required
+  - Must be a non-negative integer
+- **desc**: 
+  - Optional
+  - Maximum length: 1000 characters
+- **id_category**: 
+  - Required
+  - Must reference an existing category
+- **created_at**: 
+  - Auto-generated on product creation
+  - Cannot be modified after creation
+- **updated_at**: 
+  - Auto-updated whenever product data is modified
+  - Includes stock changes, price updates, description changes
