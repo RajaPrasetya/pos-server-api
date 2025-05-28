@@ -57,3 +57,48 @@ export class UserTest {
         });
     }
 }
+
+export class CategoryTest {
+
+    static async create() {
+        await prismaClient.category.create({
+            data: {
+                id_category: 1,
+                category_name: "Test Category",
+            }
+        })
+    }
+
+    static async createMany(count: number = 10) {
+        const categories = [];
+        
+        for (let i = 0; i < count; i++) {
+            categories.push({
+                category_name: `Test Category ${i}`,
+            });
+        }
+        
+        await prismaClient.category.createMany({
+            data: categories,
+            skipDuplicates: true, // Skip duplicates if any
+        });
+    }
+
+    static async delete() {
+        await prismaClient.category.deleteMany({
+            where: {
+                category_name: "Test Category"
+            }
+        });
+    }
+
+    static async deleteMany() {
+        await prismaClient.category.deleteMany({
+            where: {
+                category_name: {
+                    startsWith: "Test Category"
+                }
+            }
+        });
+    }
+}

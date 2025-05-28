@@ -3,7 +3,7 @@ import app from '..';
 import { logger } from '../application/logging';
 import { UserTest } from './test-util';
 
-describe('POST /api/register', () => {
+describe('POST /api/users', () => {
 
     afterEach(async () => {
         await UserTest.delete();
@@ -155,7 +155,7 @@ describe('POST /api/users/login', () => {
     })
 })
 
-describe('GET /api/user', () => {
+describe('GET /api/users', () => {
 
     beforeEach(async () => {
         await UserTest.create()
@@ -166,7 +166,7 @@ describe('GET /api/user', () => {
     })
 
     it('should get user details', async () => {
-        const res = await app.request('/api/user', {
+        const res = await app.request('/api/users/current', {
             method: 'GET',
             headers: {
                 'Authorization': 'test',
@@ -176,13 +176,14 @@ describe('GET /api/user', () => {
         expect(res.status).toBe(200);
 
         const body = await res.json();
+        logger.debug(body);
         expect(body.data).toBeDefined();
         expect(body.data.username).toBe('testuser');
         expect(body.data.email).toBe('test@gmail.com');
     })
 
     it('should not be able to get user if token is invalid', async () => {
-        const res = await app.request('/api/user', {
+        const res = await app.request('/api/users/current', {
             method: 'GET',
             headers: {
                 'Authorization': 'salah',
@@ -192,24 +193,26 @@ describe('GET /api/user', () => {
         expect(res.status).toBe(401);
 
         const body = await res.json();
+        logger.debug(body);
         expect(body.errors || body.message).toBeDefined();
 
     })
 
     it('should not be able to get user if no Authorization Header', async () => {
-        const res = await app.request('/api/user', {
+        const res = await app.request('/api/users/current', {
             method: 'GET',
         })
 
         expect(res.status).toBe(401);
 
         const body = await res.json();
+        logger.debug(body);
         expect(body.errors || body.message).toBeDefined();
 
     })
 })
 
-describe('DELETE /api/user/logout', () => {
+describe('DELETE /api/users/logout', () => {
     beforeEach(async () => {
         await UserTest.create()
     })
@@ -219,7 +222,7 @@ describe('DELETE /api/user/logout', () => {
     })
 
     it('should revoke user token', async()=> {
-        const res = await app.request('/api/user/logout', {
+        const res = await app.request('/api/users/logout', {
             method: 'delete',
             headers: {
                 'Authorization': 'test',
@@ -234,7 +237,7 @@ describe('DELETE /api/user/logout', () => {
     })
 
     it('should not be able to logout if token is invalid', async()=> {
-        let res = await app.request('/api/user/logout', {
+        let res = await app.request('/api/users/logout', {
             method: 'delete',
             headers: {
                 'Authorization': 'test',
@@ -246,7 +249,7 @@ describe('DELETE /api/user/logout', () => {
         expect(body.data).toBeDefined();
         expect(body.message).toBe('User logged out successfully');
 
-        res = await app.request('/api/user/logout', {
+        res = await app.request('/api/users/logout', {
             method: 'delete',
             headers: {
                 'Authorization': 'test',

@@ -1,4 +1,3 @@
-import { use } from "hono/jsx";
 import { prismaClient } from "../application/database";
 import { User } from "../generated/prisma";
 import { RegisterUserRequest, toUserResponse, UpdateUserRequest, UserResponse } from "../model/user-model";

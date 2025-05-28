@@ -3,11 +3,12 @@ import { LoginUserRequest, RegisterUserRequest, UpdateUserRequest } from "../mod
 import { UserService } from "../service/user-service";
 import { ApplicationVariables } from "../model/auth-model";
 import { User } from "../generated/prisma";
+import { authMiddleware } from "../middleware/auth-middleware";
 
 export const userController = new Hono<{Variables: ApplicationVariables}>();
 
 // REGISTER USER
-userController.post('/api/users', async (c) => {
+userController.post('/', async (c) => {
     const req = await c.req.json() as RegisterUserRequest;
 
     const res = await UserService.register(req)
@@ -20,7 +21,7 @@ userController.post('/api/users', async (c) => {
 });
 
 // LOGIN USER
-userController.post('/api/users/login', async (c) => {
+userController.post('/login', async (c) => {
     const req = await c.req.json() as LoginUserRequest;
 
     const res = await UserService.login(req);
@@ -33,18 +34,10 @@ userController.post('/api/users/login', async (c) => {
 });
 
 // Middleware to get user from Authorization header
-userController.use(async (c, next) => {
-
-    const authHeader = c.req.header('Authorization');
-    const user = await UserService.getToken(authHeader);
-    
-    c.set('user', user);
-    
-    return next();
-})
+userController.use(authMiddleware);
 
 // GET ALL USERS
-userController.get('/api/users', async (c) => {
+userController.get('/', async (c) => {
     const users = await UserService.getAllUsers();
 
     return c.json({
@@ -55,7 +48,7 @@ userController.get('/api/users', async (c) => {
 });
 
 // GET CURRENT USER DETAILS
-userController.get('/api/user', async (c) => {
+userController.get('/current', async (c) => {
     const user = c.get('user') as User;
 
     return c.json({
@@ -66,7 +59,7 @@ userController.get('/api/user', async (c) => {
 })
 
 // GET USER BY USERNAME
-userController.get('/api/users/:username', async (c) => {
+userController.get('/:username', async (c) => {
     const username = c.req.param('username');
     
     const user = await UserService.getUserByUsername(username);
@@ -79,7 +72,7 @@ userController.get('/api/users/:username', async (c) => {
 });
 
 // UPDATE USERS BY USERNAME
-userController.put('/api/users/:username', async (c) => {
+userController.put('/:username', async (c) => {
     const username = c.req.param('username');
     const req = await c.req.json() as UpdateUserRequest;
 
@@ -93,7 +86,7 @@ userController.put('/api/users/:username', async (c) => {
 });
 
 // LOG OUT USER (REMOVE TOKEN)
-userController.delete('api/user/logout', async (c) => {
+userController.delete('/logout', async (c) => {
     const user = c.get('user') as User;
 
     let res = await UserService.logout(user);
