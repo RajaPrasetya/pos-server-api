@@ -1,10 +1,10 @@
 import { prismaClient } from "../application/database";
+import { signJwt } from '../application/jwt';
 import { Decimal } from "../generated/prisma/runtime/library";
 
 export class UserTest {
-
-    static async create(){
-        await prismaClient.user.create({
+    static async create() {
+        const user = await prismaClient.user.create({
             data: {
                 username: "testuser",
                 password: await Bun.password.hash("test1234", {
@@ -13,9 +13,23 @@ export class UserTest {
                 }),
                 email: "test@gmail.com",
                 role: "cashier",
-                token: "test",
             }
-        })
+        });
+
+        // Generate token JWT dengan id_user hasil insert
+        const token = await signJwt({
+            id_user: user.id_user,
+            username: user.username,
+            role: user.role,
+        });
+
+        // (Opsional) update kolom token di DB jika memang ada
+        await prismaClient.user.update({
+            where: { id_user: user.id_user },
+            data: { token }
+        });
+
+        return token;
     }
 
     static async createMany(count: number = 10) {

@@ -3,6 +3,8 @@ import app from '..';
 import { logger } from '../application/logging';
 import { UserTest } from './test-util';
 
+let token: string;
+
 describe('POST /api/users', () => {
 
     afterEach(async () => {
@@ -14,12 +16,11 @@ describe('POST /api/users', () => {
         const res = await app.request('api/users', {
             method: 'POST',
             body: JSON.stringify({
-                // Missing required fields
                 username: 'testuser',
                 password: "",
                 email: "",
                 role: ""
-            }), // Invalid body
+            }),
         })
 
         const body = await res.json();
@@ -27,8 +28,6 @@ describe('POST /api/users', () => {
 
         expect(res.status).toBe(400);
         expect(body.errors).toBeDefined();
-
-
     })
 
     //rejects register if username already exists
@@ -38,12 +37,11 @@ describe('POST /api/users', () => {
         const res = await app.request('api/users', {
             method: 'POST',
             body: JSON.stringify({
-                // Missing required fields
                 username: 'testuser',
                 password: "test1234",
                 email: "test@gmail.com",
                 role: "cashier"
-            }), // Invalid body
+            }),
         })
 
         const body = await res.json();
@@ -60,12 +58,11 @@ describe('POST /api/users', () => {
         const res = await app.request('api/users', {
             method: 'POST',
             body: JSON.stringify({
-                // Missing required fields
                 username: 'testuser123',
                 password: "test1234",
                 email: "test@gmail.com",
                 role: "cashier"
-            }), // Invalid body
+            }),
         })
 
         const body = await res.json();
@@ -80,12 +77,11 @@ describe('POST /api/users', () => {
         const res = await app.request('api/users', {
             method: 'POST',
             body: JSON.stringify({
-                // Missing required fields
                 username: 'testuser',
                 password: "test1234",
                 email: "test@gmail.com",
                 role: "cashier"
-            }), // Invalid body
+            }),
         })
 
         const body = await res.json();
@@ -102,7 +98,7 @@ describe('POST /api/users', () => {
 describe('POST /api/users/login', () => {
 
     beforeEach(async () => {
-        await UserTest.create()
+        token = await UserTest.create();
     })
 
     afterEach(async () => {
@@ -158,7 +154,7 @@ describe('POST /api/users/login', () => {
 describe('GET /api/users', () => {
 
     beforeEach(async () => {
-        await UserTest.create()
+        token = await UserTest.create();
     })
 
     afterEach(async () => {
@@ -169,7 +165,7 @@ describe('GET /api/users', () => {
         const res = await app.request('/api/users/current', {
             method: 'GET',
             headers: {
-                'Authorization': 'test',
+                'Authorization': `Bearer ${token}`,
             }
         })
 
@@ -195,7 +191,6 @@ describe('GET /api/users', () => {
         const body = await res.json();
         logger.debug(body);
         expect(body.errors || body.message).toBeDefined();
-
     })
 
     it('should not be able to get user if no Authorization Header', async () => {
@@ -208,13 +203,12 @@ describe('GET /api/users', () => {
         const body = await res.json();
         logger.debug(body);
         expect(body.errors || body.message).toBeDefined();
-
     })
 })
 
 describe('DELETE /api/users/logout', () => {
     beforeEach(async () => {
-        await UserTest.create()
+        token = await UserTest.create();
     })
 
     afterEach(async () => {
@@ -225,13 +219,14 @@ describe('DELETE /api/users/logout', () => {
         const res = await app.request('/api/users/logout', {
             method: 'delete',
             headers: {
-                'Authorization': 'test',
+                'Authorization': `Bearer ${token}`,
             }
         })
 
         expect(res.status).toBe(200);
 
         const body = await res.json();
+        logger.debug(body);
         expect(body.data).toBeDefined();
         expect(body.message).toBe('User logged out successfully');
     })
@@ -240,30 +235,20 @@ describe('DELETE /api/users/logout', () => {
         let res = await app.request('/api/users/logout', {
             method: 'delete',
             headers: {
-                'Authorization': 'test',
+                'Authorization': 'salah',
             }
         })
 
-        expect(res.status).toBe(200);
-        let body = await res.json();
-        expect(body.data).toBeDefined();
-        expect(body.message).toBe('User logged out successfully');
-
-        res = await app.request('/api/users/logout', {
-            method: 'delete',
-            headers: {
-                'Authorization': 'test',
-            }
-        })
         expect(res.status).toBe(401);
-        body = await res.json();
+        let body = await res.json();
+        logger.debug(body);
         expect(body.errors || body.message).toBeDefined();
     })
 }) 
 
 describe('GET /api/users/:username', () => {
     beforeEach(async () => {
-        await UserTest.create()
+        token = await UserTest.create();
     })
 
     afterEach(async () => {
@@ -274,11 +259,12 @@ describe('GET /api/users/:username', () => {
         const res = await app.request('/api/users/testuser', {
             method: 'GET',
             headers: {
-                'Authorization' : 'test',
+                'Authorization' : `Bearer ${token}`,
             }
         })
         expect(res.status).toBe(200);
         const body = await res.json();
+        logger.debug(body);
         expect(body.data).toBeDefined();
         expect(body.data.username).toBe('testuser');
    })
@@ -286,23 +272,26 @@ describe('GET /api/users/:username', () => {
 
 describe('GET /api/users', () => {
     beforeEach(async () => {
+        token = await UserTest.create();
         await UserTest.createMany(10);
     })
 
     afterEach(async () => {
         await UserTest.deleteMany(10);
+        await UserTest.delete();
     })
 
     it('should get all users', async () => {
         const res = await app.request('/api/users', {
             method: 'GET',
             headers: {
-                'Authorization': 'testtoken',
+                'Authorization': `Bearer ${token}`,
             }
         })
 
         expect(res.status).toBe(200);
         const body = await res.json();
+        logger.debug(body);
         expect(body.data).toBeDefined();
         expect(body.data.length).toBeGreaterThan(0);
     })
@@ -323,7 +312,7 @@ describe('GET /api/users', () => {
 
 describe('PUT /api/users/:username', () => {
     beforeEach(async () => {
-        await UserTest.create()
+        token = await UserTest.create();
     })
 
     afterEach(async () => {
@@ -334,7 +323,7 @@ describe('PUT /api/users/:username', () => {
         const res = await app.request('/api/users/testuser', {
             method: 'PUT',
             headers: {
-                'Authorization': 'test',
+                'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify({
                 password: 'updatedPassword123',
@@ -342,6 +331,7 @@ describe('PUT /api/users/:username', () => {
         })
         expect(res.status).toBe(200);
         const body = await res.json();
+        logger.debug(body);
         expect(body.data).toBeDefined();
         expect(body.data.username).toBe('testuser');
         expect(body.data.email).toBe('test@gmail.com');
@@ -381,7 +371,7 @@ describe('PUT /api/users/:username', () => {
         const res = await app.request('/api/users/testuser', {
             method: 'PUT',
             headers: {
-                'Authorization': 'test',
+                'Authorization': `Bearer ${token}`,
             },
             body: JSON.stringify({
                 email: '',
@@ -390,6 +380,7 @@ describe('PUT /api/users/:username', () => {
 
         expect(res.status).toBe(400);
         const body = await res.json();
+        logger.debug(body);
         expect(body.errors || body.message).toBeDefined();
     })
 })

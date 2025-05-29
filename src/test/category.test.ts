@@ -3,9 +3,11 @@ import { CategoryTest, UserTest } from './test-util';
 import app from '..';
 import { logger } from '../application/logging';
 
+let token: string;
+
 describe('POST /api/categories', () => {
     beforeEach(async () => {
-        await UserTest.create();
+        token = await UserTest.create();
     })
     
     afterEach(async () => {
@@ -18,7 +20,7 @@ describe('POST /api/categories', () => {
         const res = await app.request('api/categories', {
             method: 'POST',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 category_name: "Test Category",
@@ -39,7 +41,7 @@ describe('POST /api/categories', () => {
         const res = await app.request('api/categories', {
             method: 'POST',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 category_name: "Test Category",
@@ -57,7 +59,7 @@ describe('POST /api/categories', () => {
         const res = await app.request('api/categories', {
             method: 'POST',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 category_name: "",
@@ -133,7 +135,7 @@ describe('GET /api/categories', () => {
 
 describe('PUT /api/categories/:id_category', () => {
     beforeEach(async () => {
-        await UserTest.create();
+        token = await UserTest.create();
     })
 
     afterEach(async () => {
@@ -145,7 +147,7 @@ describe('PUT /api/categories/:id_category', () => {
         const res = await app.request('api/categories/1', {
             method: 'PUT',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 category_name: "Test Category 100",
@@ -168,7 +170,7 @@ describe('PUT /api/categories/:id_category', () => {
         const res = await app.request('api/categories/1', {
             method: 'PUT',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 category_name: "Test Category 3",
@@ -188,7 +190,7 @@ describe('PUT /api/categories/:id_category', () => {
         const res = await app.request('api/categories/1', {
             method: 'PUT',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 category_name: "",
@@ -206,7 +208,7 @@ describe('PUT /api/categories/:id_category', () => {
 
 describe('DELETE /api/categories/:id_category', () => {
     beforeEach(async () => {
-        await UserTest.create();
+        token = await UserTest.create();
     })
 
     afterEach(async () => {
@@ -220,7 +222,7 @@ describe('DELETE /api/categories/:id_category', () => {
         const res = await app.request('api/categories/1', {
             method: 'DELETE',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             }
         });
         const body = await res.json();
@@ -235,7 +237,7 @@ describe('DELETE /api/categories/:id_category', () => {
         const res = await app.request('api/categories/999', {
             method: 'DELETE',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             }
         });
         const body = await res.json();

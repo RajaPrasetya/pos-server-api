@@ -3,10 +3,12 @@ import { CategoryTest, ProductTest, UserTest } from './test-util';
 import app from '..';
 import { logger } from '../application/logging';
 
+let token: string;
+
 describe('POST /api/products', () => { 
     beforeEach(async () => {
         await CategoryTest.create();
-        await UserTest.create();
+        token = await UserTest.create();
     });
 
     afterEach(async () => {
@@ -20,7 +22,7 @@ describe('POST /api/products', () => {
         const res = await app.request('api/products', {
             method: 'POST',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 product_name: "Test Product",
@@ -45,7 +47,7 @@ describe('POST /api/products', () => {
         const res = await app.request('api/products', {
             method: 'POST',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 product_name: "Test Product",
@@ -67,7 +69,7 @@ describe('POST /api/products', () => {
         const res = await app.request('api/products', {
             method: 'POST',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 product_name: "",
@@ -88,9 +90,7 @@ describe('POST /api/products', () => {
     it('should fail to create a product if user is not authenticated', async () => {
         const res = await app.request('api/products', {
             method: 'POST',
-            headers: {
-                'Authorization': 'salah'
-            },
+            // Tidak pakai Authorization header
             body: JSON.stringify({
                 product_name: "Test Product",
                 price: 10000,
@@ -184,7 +184,7 @@ describe('GET /api/products/:id', () => {
 
 describe('PUT /api/products/:id', () => {
     beforeEach(async () => {
-        await UserTest.create();
+        token = await UserTest.create();
         await CategoryTest.create();
         await ProductTest.create();
     });
@@ -200,7 +200,7 @@ describe('PUT /api/products/:id', () => {
         const res = await app.request('api/products/1', {
             method: 'PUT',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 product_name: "Test Product Updated",
@@ -229,7 +229,7 @@ describe('PUT /api/products/:id', () => {
         const res = await app.request('api/products/1', {
             method: 'PUT',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 product_name: "Test Product 2",
@@ -251,7 +251,7 @@ describe('PUT /api/products/:id', () => {
         const res = await app.request('api/products/12345', {
             method: 'PUT',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 product_name: "Test Product Updated",
@@ -273,7 +273,7 @@ describe('PUT /api/products/:id', () => {
         const res = await app.request('api/products/abc', {
             method: 'PUT',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 product_name: "Test Product Updated",
@@ -294,9 +294,7 @@ describe('PUT /api/products/:id', () => {
     it('should fail to update a product if user is not authenticated', async () => {
         const res = await app.request('api/products/1', {
             method: 'PUT',
-            headers: {
-                'Authorization': 'salah'
-            },
+            // Tidak pakai Authorization header
             body: JSON.stringify({
                 product_name: "Test Product Updated",
                 price: 20000,
@@ -315,7 +313,7 @@ describe('PUT /api/products/:id', () => {
 
 describe('DELETE /api/products/:id', () => {
     beforeEach(async () => {
-        await UserTest.create();
+        token = await UserTest.create();
         await CategoryTest.create();
         await ProductTest.create();
     });
@@ -331,7 +329,7 @@ describe('DELETE /api/products/:id', () => {
         const res = await app.request('api/products/1', {
             method: 'DELETE',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             }
         })
 
@@ -343,7 +341,7 @@ describe('DELETE /api/products/:id', () => {
         const res = await app.request('api/products/12345', {
             method: 'DELETE',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             }
         })
 
@@ -358,7 +356,7 @@ describe('DELETE /api/products/:id', () => {
         const res = await app.request('api/products/abc', {
             method: 'DELETE',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             }
         })
 
@@ -372,9 +370,7 @@ describe('DELETE /api/products/:id', () => {
     it('should fail to delete a product if user is not authenticated', async () => {
         const res = await app.request('api/products/1', {
             method: 'DELETE',
-            headers: {
-                'Authorization': 'salah'
-            }
+            // Tidak pakai Authorization header
         })
 
         const body = await res.json();
@@ -388,7 +384,7 @@ describe('DELETE /api/products/:id', () => {
         const res = await app.request('api/products/1', {
             method: 'DELETE',
             headers: {
-                'Authorization': 'test2'
+                'Authorization': 'Bearer salah'
             }
         })
 

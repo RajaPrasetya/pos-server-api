@@ -3,6 +3,7 @@ import { User } from "../generated/prisma";
 import { RegisterUserRequest, toUserResponse, UpdateUserRequest, UserResponse } from "../model/user-model";
 import { UserValidation } from "../validation/user-validation";
 import { HTTPException } from "hono/http-exception";
+import { signJwt } from '../application/jwt'
 
 export class UserService {
 
@@ -47,35 +48,32 @@ export class UserService {
         req = UserValidation.LOGIN.parse(req);
 
         let user = await prismaClient.user.findUnique({
-            where: {
-                username: req.username,
-            }
+            where: { username: req.username }
         });
 
         if (!user) {
-            throw new HTTPException(401, {
-                message: "Invalid username or password",
-            });
+            throw new HTTPException(401, { message: "Invalid username or password" });
         }
 
         const isPasswordValid = await Bun.password.verify(req.password, user.password, "bcrypt");
         if (!isPasswordValid) {
-            throw new HTTPException(401, {
-                message: "Invalid username or password",
-            });
+            throw new HTTPException(401, { message: "Invalid username or password" });
         }
 
+        // Generate JWT
+        const token = await signJwt({
+            id_user: user.id_user,
+            username: user.username,
+            role: user.role,
+        });
+
         user = await prismaClient.user.update({
-           where: {
-            username: req.username,
-           },
-              data: {
-                token: crypto.randomUUID(),
-              },
-        })
+            where: { username: req.username },
+            data: { token }
+        });
 
         const res = toUserResponse(user);
-        res.token = user.token!;
+        res.token = token;
         return res;
     }
 

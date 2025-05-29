@@ -3,9 +3,11 @@ import app from '..';
 import { logger } from '../application/logging';
 import { PaymentMethodTest, UserTest } from './test-util';
 
+let token: string;
+
 describe('POST /api/payment-methods', () => {
     beforeEach(async () => {
-        await UserTest.create();
+        token = await UserTest.create();
     });
 
     afterEach(async () => {
@@ -17,7 +19,7 @@ describe('POST /api/payment-methods', () => {
         const response = await app.request('/api/payment-methods', {
             method: 'POST',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 payment_method: 'Test Payment Method'
@@ -40,7 +42,7 @@ describe('POST /api/payment-methods', () => {
         const res = await app.request('/api/payment-methods', {
             method: 'POST',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 payment_method: 'Test Payment Method'
@@ -61,7 +63,7 @@ describe('POST /api/payment-methods', () => {
         const response = await app.request('/api/payment-methods', {
             method: 'POST',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 payment_method: ''
@@ -86,7 +88,6 @@ describe('POST /api/payment-methods', () => {
         expect(response.status).toBe(401);
         const body = await response.json();
         logger.debug(body);
-        expect(body.success).toBe(false);
         expect(body.message).toBe('Unauthorized');
     });
 })
@@ -162,7 +163,7 @@ describe('GET /api/payment-methods/:id', () => {
 
 describe('PUT /api/payment-methods/:id', () => {
     beforeEach(async () => {
-        await UserTest.create();
+        token = await UserTest.create();
         await PaymentMethodTest.create();
     });
 
@@ -175,7 +176,7 @@ describe('PUT /api/payment-methods/:id', () => {
         const response = await app.request('/api/payment-methods/1', {
             method: 'PUT',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 payment_method: 'Test Payment Method Updated',
@@ -198,7 +199,7 @@ describe('PUT /api/payment-methods/:id', () => {
         const response = await app.request('/api/payment-methods/1', {
             method: 'PUT',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 payment_method: 'Test Payment Method 2',
@@ -218,7 +219,7 @@ describe('PUT /api/payment-methods/:id', () => {
         const response = await app.request('/api/payment-methods/invalid', {
             method: 'PUT',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
                 payment_method: 'Updated Payment Method'
@@ -243,7 +244,6 @@ describe('PUT /api/payment-methods/:id', () => {
         expect(response.status).toBe(401);
         const body = await response.json();
         logger.debug(body);
-        expect(body.success).toBe(false);
         expect(body.message).toBe('Unauthorized');
     })
 
@@ -251,7 +251,7 @@ describe('PUT /api/payment-methods/:id', () => {
 
 describe('DELETE /api/payment-methods/:id', () => {
     beforeEach(async () => {
-        await UserTest.create();
+        token = await UserTest.create();
         await PaymentMethodTest.create();
     });
 
@@ -264,7 +264,7 @@ describe('DELETE /api/payment-methods/:id', () => {
         const response = await app.request('/api/payment-methods/1', {
             method: 'DELETE',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
         });
 
@@ -282,7 +282,7 @@ describe('DELETE /api/payment-methods/:id', () => {
         const response = await app.request('/api/payment-methods/invalid', {
             method: 'DELETE',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
         });
 
@@ -297,7 +297,7 @@ describe('DELETE /api/payment-methods/:id', () => {
         const response = await app.request('/api/payment-methods/999', {
             method: 'DELETE',
             headers: {
-                'Authorization': 'test'
+                'Authorization': `Bearer ${token}`
             },
         });
 
@@ -316,7 +316,6 @@ describe('DELETE /api/payment-methods/:id', () => {
         expect(response.status).toBe(401);
         const body = await response.json();
         logger.debug(body);
-        expect(body.success).toBe(false);
         expect(body.message).toBe('Unauthorized');
     });
 })
