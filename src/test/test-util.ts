@@ -1,5 +1,6 @@
+import { HTTPException } from "hono/http-exception";
 import { prismaClient } from "../application/database";
-import { signJwt } from '../application/jwt';
+import { signJwt, verifyJwt } from '../application/jwt';
 import { Decimal } from "../generated/prisma/runtime/library";
 
 export class UserTest {
@@ -211,6 +212,88 @@ export class PaymentMethodTest {
                 payment_method: {
                     startsWith: "Test Payment Method"
                 }
+            }
+        });
+    }
+}
+
+export class TransactionTest {
+    static async create(token: string) {
+        const payload = await verifyJwt(token);
+        if (!payload || !payload.id_user) {
+            throw new HTTPException(401, {
+                message: "Unauthorized"
+            });
+        }
+
+        const transaction = await prismaClient.transaction.create({
+            data: {
+                total_price: 10000,
+                payment_method: 1,
+                status: "pending",
+                id_user: Number(payload.id_user),
+            }
+        });
+
+        return transaction;
+    }
+
+    static async createMany(count: number = 10, token: string) {
+        const payload = await verifyJwt(token);
+        if (!payload || !payload.id_user) {
+            throw new HTTPException(401, {
+                message: "Unauthorized"
+            });
+        }
+
+        const transactions = [];
+        
+        for (let i = 0; i < count; i++) {
+            transactions.push({
+                total_price: 10000 + i * 1000,
+                payment_method: 1,
+                status: "pending",
+                id_user: Number(payload.id_user),
+            });
+        }
+        
+        await prismaClient.transaction.createMany({
+            data: transactions,
+            skipDuplicates: true, // Skip duplicates if any
+        });
+    }
+
+    static async get(token: string){
+        const payload = await verifyJwt(token);
+        if (!payload || !payload.id_user) {
+            throw new HTTPException(401, {
+                message: "Unauthorized"
+            });
+        }
+        const transaction = await prismaClient.transaction.findFirst({
+            where: {
+                id_user: Number(payload.id_user),
+            },
+            orderBy: {
+                id_transaction: 'asc',
+            },
+            select: {
+                id_transaction: true,
+            },
+        });
+        return transaction;
+    }
+
+    static async delete(token: string) {
+        const payload = await verifyJwt(token);
+        if (!payload || !payload.id_user) {
+            throw new HTTPException(401, {
+                message: "Unauthorized"
+            });
+        }
+        await prismaClient.transaction.deleteMany({
+            where: {
+                id_user: Number(payload.id_user),
             }
         });
     }
