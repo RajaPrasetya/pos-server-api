@@ -1,4 +1,5 @@
 import { prismaClient } from "../application/database";
+import { Decimal } from "../generated/prisma/runtime/library";
 
 export class UserTest {
 
@@ -101,4 +102,57 @@ export class CategoryTest {
             }
         });
     }
+}
+
+export class ProductTest {
+    static async create() {
+        await prismaClient.product.create({
+            data: {
+                id_product: 1,
+                product_name: "Test Product",
+                price: new Decimal(10000),
+                stock: 10,
+                description: "This is a test product",
+                id_category: 1,
+            }
+        })
+    }
+
+    static async createMany(count: number = 10) {
+        const products = [];
+        
+        for (let i = 0; i < count; i++) {
+            products.push({
+                product_name: `Test Product ${i}`,
+                price: new Decimal(10000 + i * 1000),
+                stock: 10 + i,
+                description: `This is a test product ${i}`,
+                id_category: 1,
+            });
+        }
+        
+        await prismaClient.product.createMany({
+            data: products,
+            skipDuplicates: true, // Skip duplicates if any
+        });
+    }
+
+    static async delete() {
+        await prismaClient.product.deleteMany({
+            where: {
+                product_name: "Test Product"
+            }
+        });
+    }
+
+    static async deleteMany() {
+        await prismaClient.product.deleteMany({
+            where: {
+                product_name: {
+                    startsWith: "Test Product"
+                }
+            }
+        });
+    }
+
 }
