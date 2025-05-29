@@ -298,3 +298,41 @@ export class TransactionTest {
         });
     }
 }
+
+export class DetailTransactionTest {
+    static async create(transactionId: number) {
+        await prismaClient.detail_Transaction.create({
+            data: {
+                id_detail: 1,
+                id_transaction: transactionId,
+                id_product: 1,
+                quantity: 2,
+            }
+        })
+    }
+
+    static async createMany(count: number = 10, transactionId: number) {
+        const detailTransactions = [];
+        
+        for (let i = 0; i < count; i++) {
+            detailTransactions.push({
+                id_transaction: transactionId,
+                id_product: 1,
+                quantity: 2 + i,
+            });
+        }
+        
+        await prismaClient.detail_Transaction.createMany({
+            data: detailTransactions,
+            skipDuplicates: true, // Skip duplicates if any
+        });
+    }
+
+    static async delete() {
+        await prismaClient.detail_Transaction.deleteMany({
+            where: {
+                id_product: 1
+            }
+        });
+    }
+}

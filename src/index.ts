@@ -6,6 +6,7 @@ import { categoryController } from './controller/category-controller'
 import { productController } from './controller/product-controller'
 import { paymentMethodController } from './controller/payment-method-controller'
 import { transactionController } from './controller/transaction-controller'
+import { detailTransactionController } from './controller/detail-transaction-controller'
 
 const app = new Hono()
 
@@ -18,6 +19,7 @@ app.route('/api/categories', categoryController)
 app.route('/api/products', productController)
 app.route('/api/payment-methods', paymentMethodController)
 app.route('/api/transactions', transactionController)
+app.route('/api/transaction-details', detailTransactionController)
 
 app.onError( async (err, c) => {
   if (err instanceof HTTPException){
