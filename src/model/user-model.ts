@@ -4,7 +4,7 @@ export type RegisterUserRequest = {
     username: string;
     password: string;
     email: string;
-    role: string;
+    role?: string; // Optional, default to "cashier"
 };
 
 export type LoginUserRequest = {

@@ -80,7 +80,6 @@ describe('POST /api/users', () => {
                 username: 'testuser',
                 password: "test1234",
                 email: "test@gmail.com",
-                role: "cashier"
             }),
         })
 
