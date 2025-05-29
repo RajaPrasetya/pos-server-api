@@ -9,7 +9,7 @@ export class UserService {
 
     static async register(req: RegisterUserRequest): Promise<UserResponse> {
         req = UserValidation.REGISTER.parse(req);
-        
+
         const totalUserWithSameUsername = await prismaClient.user.count({
             where: {
                 username: req.username,
@@ -38,7 +38,10 @@ export class UserService {
         })
 
         const user = await prismaClient.user.create({
-            data: req,
+            data: {
+                ...req,
+                role: "cashier", // Default role if not provided
+            },
         })
 
         return toUserResponse(user);
@@ -77,9 +80,9 @@ export class UserService {
         return res;
     }
 
-    static async getToken(token: string | undefined | null) : Promise<User> {
+    static async getToken(token: string | undefined | null): Promise<User> {
         const result = UserValidation.TOKEN.safeParse(token);
-        
+
         if (!result.success) {
             throw new HTTPException(401, {
                 message: "Unauthorized",
@@ -202,7 +205,7 @@ export class UserService {
                 token: null,
             }
         })
-        
+
         return true;
     }
 }
