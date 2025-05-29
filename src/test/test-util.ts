@@ -156,3 +156,48 @@ export class ProductTest {
     }
 
 }
+
+export class PaymentMethodTest {
+
+    static async create() {
+        await prismaClient.payment_Method.create({
+            data: {
+                id_payment: 1,
+                payment_method: "Test Payment Method",
+            }
+        })
+    }
+
+    static async createMany(count: number = 10) {
+        const paymentMethods = [];
+        
+        for (let i = 0; i < count; i++) {
+            paymentMethods.push({
+                payment_method: `Test Payment Method ${i}`,
+            });
+        }
+        
+        await prismaClient.payment_Method.createMany({
+            data: paymentMethods,
+            skipDuplicates: true, // Skip duplicates if any
+        });
+    }
+
+    static async delete() {
+        await prismaClient.payment_Method.deleteMany({
+            where: {
+                payment_method: "Test Payment Method"
+            }
+        });
+    }
+
+    static async deleteMany() {
+        await prismaClient.payment_Method.deleteMany({
+            where: {
+                payment_method: {
+                    startsWith: "Test Payment Method"
+                }
+            }
+        });
+    }
+}

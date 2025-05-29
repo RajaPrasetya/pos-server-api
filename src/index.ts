@@ -4,6 +4,7 @@ import { HTTPException } from 'hono/http-exception'
 import { ZodError } from 'zod'
 import { categoryController } from './controller/category-controller'
 import { productController } from './controller/product-controller'
+import { paymentMethodController } from './controller/payment-method-controller'
 
 const app = new Hono()
 
@@ -14,6 +15,7 @@ app.get('/', (c) => {
 app.route('/api/users', userController)
 app.route('/api/categories', categoryController)
 app.route('/api/products', productController)
+app.route('/api/payment-methods', paymentMethodController)
 
 app.onError( async (err, c) => {
   if (err instanceof HTTPException){
