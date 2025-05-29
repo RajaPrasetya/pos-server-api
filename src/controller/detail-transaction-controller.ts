@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { authMiddleware } from "../middleware/auth-middleware";
 import { DetailTransactionService } from "../service/detail-transaction-service";
+import { roleMiddleware } from "../middleware/role-middleware";
 
 export const detailTransactionController = new Hono();
 
@@ -63,6 +64,8 @@ detailTransactionController.get('/transaction/:transactionId', async (c) => {
         data: detailTransactions,
     }, 200);
 });
+
+detailTransactionController.use(roleMiddleware(['admin', 'manager']));
 
 // UPDATE DETAIL TRANSACTION
 detailTransactionController.put('/:id', async (c) => {

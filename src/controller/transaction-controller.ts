@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { authMiddleware } from "../middleware/auth-middleware";
 import { TransactionService } from "../service/transaction-service";
+import { roleMiddleware } from "../middleware/role-middleware";
 
 export const transactionController = new Hono();
 
@@ -53,6 +54,8 @@ transactionController.get('/:id', async (c) => {
         data: transaction,
     });
 });
+
+transactionController.use(roleMiddleware(['admin', 'manager']));
 
 // UPDATE TRANSACTION
 transactionController.put('/:id', async (c) => {

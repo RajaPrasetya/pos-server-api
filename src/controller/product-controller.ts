@@ -3,6 +3,7 @@ import { ApplicationVariables } from "../model/auth-model";
 import { authMiddleware } from "../middleware/auth-middleware";
 import { CreateProductRequest, UpdateProductRequest } from "../model/product-model";
 import { ProductService } from "../service/product-service";
+import { roleMiddleware } from "../middleware/role-middleware";
 
 export const productController = new Hono<{Variables: ApplicationVariables}>();
 
@@ -40,6 +41,7 @@ productController.get('/:id', async (c) => {
 
 // Middleware Authentication
 productController.use(authMiddleware);
+productController.use(roleMiddleware(['admin', 'manager']));
 
 // CREATE PRODUCT
 productController.post('/', async (c) => {

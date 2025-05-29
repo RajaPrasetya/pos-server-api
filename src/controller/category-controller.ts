@@ -3,6 +3,7 @@ import { ApplicationVariables } from "../model/auth-model";
 import { CreateCategoryRequest } from "../model/category-model";
 import { CategoryService } from "../service/category-service";
 import { authMiddleware } from "../middleware/auth-middleware";
+import { roleMiddleware } from "../middleware/role-middleware";
 
 export const categoryController = new Hono<{ Variables: ApplicationVariables }>();
 
@@ -32,6 +33,7 @@ categoryController.get('/:id_category', async (c) => {
 });
 
 categoryController.use(authMiddleware);
+categoryController.use(roleMiddleware(['admin', 'manager']));
 
 // CREATE CATEGORY
 categoryController.post('/', async (c) => {

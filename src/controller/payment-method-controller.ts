@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { authMiddleware } from "../middleware/auth-middleware";
 import { PaymentMethodService } from "../service/payment-method-service";
 import { CreatePaymentMethodRequest } from "../model/payment-method-model";
+import { roleMiddleware } from "../middleware/role-middleware";
 
 export const paymentMethodController = new Hono();
 
@@ -40,6 +41,7 @@ paymentMethodController.get('/:id', async (c) => {
 
 // Middleware to check authentication
 paymentMethodController.use(authMiddleware);
+paymentMethodController.use(roleMiddleware(['admin', 'manager']));
 
 // CREATE PAYMENT METHOD
 paymentMethodController.post('/', async (c) => {
